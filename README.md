@@ -1,79 +1,63 @@
-```
-bank_transactions_app/
-├── assets/
-│   ├── css/
-│   │   └── custom_style.css
-│   └── images/
-│       └── logo.png
-├── data/
-│   ├── samples/
-│   │   ├── sample_transactions.csv
-│   │   ├── sample_transactions.json
-│   │   └── sample_transactions.xml
-│   └── user_uploads/
-├── output/
-│   └── exports/
-├── pages/
-│   ├── transactions.py
-│   ├── analysis.py
-│   └── settings.py
-├── src/
-│   ├── components/
-│   │   ├── sidebar.py
-│   │   ├── transaction_table.py
-│   │   └── charts.py
-│   ├── adapters/
-│   │   ├── base.py
-│   │   ├── csv_adapter.py
-│   │   ├── json_adapter.py
-│   │   ├── xml_adapter.py
-│   │   └── openbanking_adapter.py
-│   ├── services/
-│   │   ├── transaction_processor.py
-│   │   └── analysis_service.py
-│   └── utils/
-│       ├── config.py
-│       └── validators.py
-├── tests/
-│   ├── adapters/
-│   │   └── test_adapters.py
-│   └── services/
-│       └── test_transaction_processor.py
-├── .gitignore
-├── requirements.txt
-├── config.yaml
-└── app.py
-```
+# YNAB Harmonizer
 
-Key aspects of this structure:
-1. Adapter Pattern:
-- The `src/adapters/` directory implements different data source adapters
-- `base.py` defines the common interface all adapters must implement
-- Each adapter (CSV, JSON, XML, OpenBanking) handles its specific data source
+A Streamlit application that helps you reconcile bank transactions between YNAB (You Need A Budget) and your bank's CSV exports.
 
-2. Multi-Page Structure:
-- `app.py` for the landing page
-- Separate pages for transactions view, analysis, and settings
-- `components/` folder for reusable UI elements
+## Features
 
-3. Data Management:
-- `data/samples/` for built-in example files
-- `data/user_uploads/` for temporary storage of user uploads
-- `output/exports/` for generated reports or exports
+### Transaction Import
+- Import transactions from YNAB API
+- Import transactions from bank CSV files
 
-4. Business Logic:
-- `src/services/` contains core business logic
-- Separated from UI code for better maintainability
-- Transaction processing and analysis logic isolated
+Currently supported banks:
+- LHV
 
-5. Configuration:
-- `config.yaml` for application settings
-- `src/utils/config.py` for configuration management
-- Environment-specific settings can be managed here
+### Transaction Matching
+Compare transactions between YNAB and your bank's CSV export to:
+- Find matching transactions based on date and amount
+- Identify transactions present in YNAB but missing from bank export
+- Identify transactions present in bank export but missing from YNAB
 
-This structure provides:
-- Clear separation of concerns
-- Easy addition of new data source adapters
-- Reusable components
-- Testable business logic
-- Scalable architecture
+Configurable matching parameters:
+- Date tolerance (number of days)
+- Amount threshold for matching
+
+## Installation
+1. Clone the repository
+2. Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+3. Configure YNAB API access:
+    - Get your YNAB API key from https://app.ynab.com/settings/developer
+    - Set it in environment variables:
+        ```bash
+        export YNAB_API_KEY=your_api_key_here
+        ```
+    - Or add it to `config.yaml`:   
+        ```yaml
+        api_key: "your_api_key_here"
+        ```
+
+## Usage
+1. Start the application:
+    ```bash
+    streamlit run app.py
+    ```
+2. Use the sidebar to navigate between:
+    - **Home**: Import and view transactions from a single source
+    - **Transaction Matcher**: Compare transactions between YNAB and bank CSV
+
+3. Transaction Matcher
+    - Select your YNAB budget and account
+    - Upload your bank's CSV export
+    - Set matching parameters:
+        - Date tolerance for matching transactions
+Amount threshold for small discrepancies
+Click "Find Matches" to see:
+        - Number of matched transactions
+        - Unmatched transactions from both sources
+
+## Adding New Bank Support
+1. Create a new adapter in src/adapters/csv/
+2. Implement the required methods from BaseCSVAdapter
+    - Add the adapter to the mapping in src/adapters/csv/mapping.py
