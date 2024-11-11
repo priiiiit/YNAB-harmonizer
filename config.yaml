@@ -1,0 +1,2 @@
+ynab:
+  # api_key: "your_api_key_here"  # Or use YNAB_API_KEY environment variable 
